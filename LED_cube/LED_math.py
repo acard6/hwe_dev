@@ -5,58 +5,14 @@ from matplotlib.animation import FuncAnimation
 
 def main():
     n = 16
-    plot_3d(n, ani=True)
-
-
-
-def plot_3d(n=5, ani=False, plot='none',mode='none' ):
-    fig = plt.figure()
-    ax = fig.add_subplot(111,projection='3d')
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    ax.set_label('Z-axis')
-    
     x = np.linspace(0, 15, n)
-    y = np.linspace(0, 15, n)
-    X, Y = np.meshgrid(x, y)
+    y = np.linspace(0,15,n)
+    plot_3d(n,Z=z_func,a=x,b=y,var=0, ani=True,mode='none',plot='mesh')
 
-    z = sin_func(X, Y, 0,mode=mode)
-    
-    if plot == 'scat':
-        X = X.ravel()
-        Y = Y.ravel()    
-        z = z.ravel()
-        scat = ax.scatter(X,Y,z,c=z,cmap='viridis')
-    else:
-        scat = ax.plot_surface(X,Y,z, cmap='viridis')
-    ax.set_xlim(0,15)
-    ax.set_ylim(0,15)
-    ax.set_zlim(-1,1)
-    
-    if ani==False:
-        plt.show()
-        return None
-    
-    else:
-        def update(frame):
-            ax.clear()
-            z = sin_func(X,Y, frame*0.05, mode=mode)
-            if plot == 'scat':
-                scat = ax.scatter(X,Y,z,c=z,cmap='viridis')    #scatter plot
-            else:
-                scat = ax.plot_surface(X,Y,z, cmap='viridis')   #surface plot
+def func(X,Y,var,mode="none"):
+    return (np.power(X-8+var,2)+np.power(Y-8,2))/10-1
 
-            ax.set_zlim(-1,1)
-            return scat
-
-        ani = FuncAnimation(fig,update,frames=125, interval=40,blit=False)
-        #ani.save('led_bounce.mp4', writer='ffmpeg')    
-        #plt.colorbar()
-        plt.show()
-
-
-
-def sin_func(X, Y, var, mode='none'):
+def z_func(X, Y, var, mode='none'):
     l = 7.5 # horizontal shift(where it will be centered around)
     k = (np.pi/8)             # period -> T=2*pi/k
     if mode == 'bounce':
@@ -70,6 +26,70 @@ def sin_func(X, Y, var, mode='none'):
     
     #z = cos(A)*sin(kx+l)*sin(ky+l)
     return (A*np.sin(k*X+l)*np.sin(k*Y+l))
+
+
+def plot_3d(n=5,Z=z_func, a=None, b=None,var=0,  ani=False, plot='bounce',mode='none' ):
+    """
+    this function will plot a predetermined function on a 3d-plane [z(x,y)]
+
+    paramaters:
+    n (int)    - the number of sample points to use for the plot (nxn)
+    ani (bool) - allow animation of a certain type of sweep on the function
+    plot (str) - how to plot the graph (only scatter plot and mesh at the moment) 
+    mode (str) - how to animate the function (at this moment "none" does a horizontal sweep 
+                 and "bounce" bounces the function )
+
+    Z (function) - function to be mapped. the function MUST HAVE the parameters in 
+                        Z(X,Y,var), *set mode="none', is an optional param used for 
+                        animating but need to be able to properly run 
+    
+    """
+    fig = plt.figure()
+    ax = fig.add_subplot(111,projection='3d')
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    ax.set_label('Z-axis')
+    if Z != None:
+        x = a
+        y = b
+    else:
+        x = np.linspace(0, 15, n)
+        y = np.linspace(0, 15, n)
+    X, Y = np.meshgrid(x, y)
+    z = Z(X, Y, 0,mode=mode)
+    m = np.max(z)
+    if plot == 'scat':
+        X = X.ravel()
+        Y = Y.ravel()    
+        z = z.ravel()
+        scat = ax.scatter(X,Y,z,c=z,cmap='viridis')
+    else:
+        scat = ax.plot_surface(X,Y,z, cmap='viridis')
+    ax.set_xlim(0,15)
+    ax.set_ylim(0,15)
+    ax.set_zlim(-1,m)
+    
+    if ani==False:
+        plt.show()
+        return None
+    
+    else:
+        def update(frame):
+            ax.clear()
+            z = Z(X,Y, frame*0.05, mode=mode)
+            if plot == 'scat':
+                scat = ax.scatter(X,Y,z,c=z,cmap='viridis')    #scatter plot
+            else:
+                scat = ax.plot_surface(X,Y,z, cmap='viridis')   #surface plot
+
+            ax.set_zlim(-1,1)
+            return scat
+
+        ani = FuncAnimation(fig,update,frames=125, interval=40,blit=False)
+        ani.save('animation.gif', writer='pillow', fps=30)
+        #plt.colorbar()
+        plt.show()
+
 
 
 def LED_count():
