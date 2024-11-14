@@ -27,8 +27,8 @@ def z_func(X, Y, var, mode='none'):
     #z = cos(A)*sin(kx+l)*sin(ky+l)
     return (A*np.sin(k*X+l)*np.sin(k*Y+l))
 
-
-def plot_3d(n=5,Z=z_func, a=None, b=None,var=0,  ani=False, plot='bounce',mode='none' ):
+N=16
+def plot_3d(n=16,Z=z_func, a=np.linspace(0, N-1, N), b=np.linspace(0, N-1, N),var=0,  ani=False, plot='bounce',mode='none' ):
     """
     this function will plot a predetermined function on a 3d-plane [z(x,y)]
 
@@ -42,32 +42,36 @@ def plot_3d(n=5,Z=z_func, a=None, b=None,var=0,  ani=False, plot='bounce',mode='
     Z (function) - function to be mapped. the function MUST HAVE the parameters in 
                         Z(X,Y,var), *set mode="none', is an optional param used for 
                         animating but need to be able to properly run 
-    
+        X,Y - np array
+        var - variable that will change with time
+        mode - a way for different variables to be affected within your function  
     """
+    #initialize the fig for plotting
     fig = plt.figure()
     ax = fig.add_subplot(111,projection='3d')
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    ax.set_label('Z-axis')
-    if Z != None:
-        x = a
-        y = b
-    else:
-        x = np.linspace(0, 15, n)
-        y = np.linspace(0, 15, n)
+    #plt.xlabel('X-axis')
+    #plt.ylabel('Y-axis')
+    #ax.set_label('Z-axis')
+
+    x = a
+    y = b
     X, Y = np.meshgrid(x, y)
     z = Z(X, Y, 0,mode=mode)
-    m = np.max(z)
-    if plot == 'scat':
+
+    ma = np.max(z)   # min and max val of function for plotting limits
+    mi = np.min(z)
+    
+    if plot == 'scat':  #current plotting type support scat and surface
         X = X.ravel()
         Y = Y.ravel()    
         z = z.ravel()
         scat = ax.scatter(X,Y,z,c=z,cmap='viridis')
-    else:
+    else:       # surface plotting
         scat = ax.plot_surface(X,Y,z, cmap='viridis')
-    ax.set_xlim(0,15)
-    ax.set_ylim(0,15)
-    ax.set_zlim(-1,m)
+
+    ax.set_xlim(0,n-1)
+    ax.set_ylim(0,n-1)
+    ax.set_zlim(mi,ma)
     
     if ani==False:
         plt.show()
