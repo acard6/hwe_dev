@@ -5,30 +5,59 @@ from matplotlib.animation import FuncAnimation
 
 def main():
     n = 16
-    x = np.linspace(0, 15, n)
+    x = np.linspace(0,15, n)
     y = np.linspace(0,15,n)
-    plot_3d(n,Z=z_func,a=x,b=y,var=0, ani=True,mode='none',plot='mesh')
+    plot_3d(n,Z=func,a=x,b=y,var=0, ani=True,plot='scat')
+    #plot_3d(n, ani=True,mode='bounce')
+
+class func_animate():
+    def __init__(self, save=False, animate=False, show=False):
+        self.save = save
+        self.animate = animate
+        self.show = show
+
+    def __str__(self):
+        return f"{self.save}, {self.animate}, {self.show}"
+    
+    def set_func(self):
+        """
+        set the function of
+        """
+        pass
+
+
 
 def func(X,Y,var,mode="none"):
-    return (np.power(X-8+var,2)+np.power(Y-8,2))/10-1
+    """
+    function used to test out passing functions into my plotter
+    """
+    #return (np.power(X-1+var,2)+np.power(Y,2))/10-1
+    k = np.pi/112.5
+    l = 7.5
+    A = 8
+    return np.round(A*np.cos(np.power(X-l,2)*k+np.power(Y-l,2)*k+var)+8)
 
 def z_func(X, Y, var, mode='none'):
-    l = 7.5 # horizontal shift(where it will be centered around)
+    """
+    Default plotted function used by my animated/plotter to show its capabilities
+    """
+    #l = 7.5 # horizontal shift(where it will be centered around)
+    l = np.pi/2
     k = (np.pi/8)             # period -> T=2*pi/k
+    h = 8
+    A = 8
     if mode == 'bounce':
-        #A = np.cos(var)    # amplitude    
+        A = A*np.cos(var)    # amplitude    
         #A = np.pow(var,1/3)
         #A = np.power(var-8,2)/32-1
-        A = 2.1*np.exp(-np.pow(var-2.5,2)/1.4)-1.06
+        #A = 2.1*np.exp(-np.pow(var-2.5,2)/1.4)-1.06
     else:
-        A = 1
         l += var
-    
     #z = cos(A)*sin(kx+l)*sin(ky+l)
-    return (A*np.sin(k*X+l)*np.sin(k*Y+l))
+    return np.round(A*np.sin(k*X+l)*np.sin(k*Y+l)+h)
 
 N=16
-def plot_3d(n=16,Z=z_func, a=np.linspace(0, N-1, N), b=np.linspace(0, N-1, N),var=0,  ani=False, plot='bounce',mode='none' ):
+def plot_3d(n=16,Z=z_func, a=np.linspace(0, N-1, N), b=np.linspace(0, N-1, N),var=0,  ani=False, plot='mesh',mode='none' ):
     """
     this function will plot a predetermined function on a 3d-plane [z(x,y)]
 
@@ -42,9 +71,10 @@ def plot_3d(n=16,Z=z_func, a=np.linspace(0, N-1, N), b=np.linspace(0, N-1, N),va
     Z (function) - function to be mapped. the function MUST HAVE the parameters in 
                         Z(X,Y,var), *set mode="none', is an optional param used for 
                         animating but need to be able to properly run 
-        X,Y - np array
-        var - variable that will change with time
-        mode - a way for different variables to be affected within your function  
+        X,Y -   np array
+        var -   variable that will change with time
+        mode -  a way for certain variables in your func to change with time and how 
+                they will change by defining a different mode of changing.
     """
     #initialize the fig for plotting
     fig = plt.figure()
@@ -53,12 +83,16 @@ def plot_3d(n=16,Z=z_func, a=np.linspace(0, N-1, N), b=np.linspace(0, N-1, N),va
     #plt.ylabel('Y-axis')
     #ax.set_label('Z-axis')
 
+    #initalize the x and y coords with your predefined range on the mesh grid
     x = a
     y = b
     X, Y = np.meshgrid(x, y)
+
+    #using your range plot the function
     z = Z(X, Y, 0,mode=mode)
 
-    ma = np.max(z)   # min and max val of function for plotting limits
+    # min and max val of function for plotting limits
+    ma = np.max(z)
     mi = np.min(z)
     
     if plot == 'scat':  #current plotting type support scat and surface
@@ -69,14 +103,15 @@ def plot_3d(n=16,Z=z_func, a=np.linspace(0, N-1, N), b=np.linspace(0, N-1, N),va
     else:       # surface plotting
         scat = ax.plot_surface(X,Y,z, cmap='viridis')
 
+    # limits set by your input
     ax.set_xlim(0,n-1)
     ax.set_ylim(0,n-1)
     ax.set_zlim(mi,ma)
     
     if ani==False:
         plt.show()
-        return None
-    
+
+    # animating a variable changing with time by updating frames
     else:
         def update(frame):
             ax.clear()
@@ -86,11 +121,11 @@ def plot_3d(n=16,Z=z_func, a=np.linspace(0, N-1, N), b=np.linspace(0, N-1, N),va
             else:
                 scat = ax.plot_surface(X,Y,z, cmap='viridis')   #surface plot
 
-            ax.set_zlim(-1,1)
+            ax.set_zlim(mi,ma)
             return scat
 
         ani = FuncAnimation(fig,update,frames=125, interval=40,blit=False)
-        ani.save('animation.gif', writer='pillow', fps=30)
+        #ani.save('animation.gif', writer='pillow', fps=30) #save the animation
         #plt.colorbar()
         plt.show()
 
