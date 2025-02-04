@@ -1,138 +1,157 @@
 #include <stdio.h>
-// #include <FastLED.h>
-#include <LiteLED.h>
+#include <FastLED.h>
+// #include <LiteLED.h>
 // #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
 #include <avr/power.h>  // Required for 16 MHz Adafruit Trinket
 #endif
 
 #define BAUD_RATE 115200
-#define LED_PIN 23
-#define NUM_LED 1
+#define NUM_LEDS 120
+#define DATA_PIN 2
 #define SEC 1000
+#define INPUT1 4
+#define INPUT2 15
 
-#define LED_TYPE  LED_STRIP_APA106
-#define LED_TYPE_IS_RGBW 0   // if the LED is an RGBW type, change the 0 to 1
-#define LED_BRIGHT 168   // sets how bright the LED is. O is off; 255 is burn your eyeballs out (not recommended)
+CRGB leds[NUM_LEDS];  // setup for FastLED
+const int row = 12;
+const int col = 10;
 
-// Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, LED_PIN, NEO_RGB + NEO_KHZ800);
-// CRGB leds[NUMPIXELS];
-static const crgb_t L_RED = 0xff0000;
-static const crgb_t L_GREEN = 0x00ff00;
-static const crgb_t L_BLUE = 0x0000ff;
-LiteLED myLED( LED_TYPE, LED_TYPE_IS_RGBW );
+typedef struct{
+  uint8_t r;
+  uint8_t g;
+  uint8_t b;
+}colors;
+
+
+
+
+colors ColorArr[row][col] ={ {0} };
+
 
 void setup() {
+  delay(2 * SEC);
   Serial.begin(BAUD_RATE);
-  // Initialize and begin the LED
-  // pixels.begin();
-  // FastLED.addLeds<APA106, LED_PIN, RGB>(leds, NUMPIXELS);
-  myLED.begin(LED_PIN, NUM_LED);         // initialze the myLED object. Here we have 1 LED attached to the LED_GPIO pin
-  myLED.brightness(LED_BRIGHT);     // set the LED photon intensity level
-  myLED.setPixel(0, L_GREEN, 1);    // set the LED colour and show it
-  delay(SEC);
+  
+  pinMode(INPUT1, INPUT);
+  pinMode(INPUT2, INPUT);
 
-  Serial.println("Flashed & Running. Now Runnig LED_Driver 1.00.4");
+
+  // Initialize and begin the LED
+  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
+  FastLED.setBrightness(64);  // setting brightness to 25%
+
+  // draw_circle(1);
+  // draw_square(2);
+
+  Serial.println("Flashed & Running. Now Runnig LED_Driver 1.00.9");
   Serial.println("ESP32 is ready for use :)");
 }
 
-int loop_var = 0;
-crgb_t color = 0x0;
+
 
 void loop() {
   // put your main code here, to run repeatedly:
+  int read1 = digitalRead(INPUT1);
+  int read2 = digitalRead(INPUT2);
   
-  // FastLED blink
-  // leds[0] = CRGB::Red;
-  // FastLED.show();
-  // delay(50);
-  // // Now turn the LED off, then pause
-  // leds[0] = CRGB::Black;
-  // FastLED.show();
-  
-  // adafruit blink
-  // pixels.setPixelColor(0, pixels.Color(0, 0, 160));
-  // pixels.show();
-  // delay(SEC);
-  // pixels.setPixelColor(0, pixels.Color(0, 0, 0));
-  // pixels.show();
-  // delay(SEC);
-
-  // LiteLED blink
-  if (loop_var == 1){
-    color = L_BLUE;    
+  if ((read1 == 1) && (read2 == 1)){
+    draw_circle(1);
+    clear();
+    display_shape();
+    delay(2*SEC);
   }
-  else if (loop_var == 2){
-    color = L_GREEN;    
+  
+  if ((read1 == 1) && (read2 == 0)){
+    draw_square(2);
+    clear();
+    display_shape();
+    delay(2*SEC);
+  }
+  if ((read1 == 0) && (read2 == 1)){
+    loop_led();
   }
   else{
-    color = L_RED;
+    clear();
+    FastLED.show();
   }
-  loop_var++;
-  loop_var = loop_var % 3;
+}
 
 
-  myLED.setPixel( 0, color, 1);           // turn the LED off (brightness, 1=show )
-  delay(SEC);
+void clear(){
+  for (int i=0; i<NUM_LEDS; i++){
+    leds[i] = CRGB::Black;
+  }
+}
 
-  myLED.clear(1);  // clear LED buffer and show
-  delay(SEC);
+// FastLED blink
+void loop_led(){
+  for (int i=0; i<NUM_LEDS; i++){
+    leds[i] = CRGB::Red;
+    FastLED.show();
+    delay(50);
+    leds[i] = CRGB::Black;
+
+  }
+
+}
+
+/*
+ *  
+ *  convert the 2d array that describes a shape to the 1d LED matrix
+ *  
+ */
+void display_shape(){
+  for (int i = 0; i < row; i++) {
+    for (int j=0; j < col; j++){
+      leds[i*col+j] = CRGB(ColorArr[i][j].r, ColorArr[i][j].g, ColorArr[i][j].b);
+    }
+    FastLED.show();
+
+  }
+}
+
+/*
+ *  draws a circle in a 2d array 
+ */
+void draw_circle(int radius){
+    int x0 = row/2;
+    int y0  =col/2;
+    int dist;
+    for (int i = 0; i < row; i++){
+      for (int j = 0; j < col; j++){
+        dist = sqrt(sq(i-x0) + sq(j-y0));
+        if (dist <= radius){
+          ColorArr[i][j].r = 128;
+          ColorArr[i][j].g = 0;
+          ColorArr[i][j].b = 0;
+        }
+      }
+    }
+    ColorArr[x0][y0].r = 0;
+    ColorArr[x0][y0].g = 128;
+    ColorArr[x0][y0].b = 0;
 
 }
 
 
-// // thanks to http://forum.arduino.cc/index.php?topic=307655.5
-// void setLedColorHSV(int h, double s, double v) {
+/*
+ *  draws a square in a 2d array
+ */
+void draw_square(int width){
+    int x0 = row/2;
+    int y0  =col/2;
+    for (int i = 0; i < row; i++){
+      for (int j = 0; j < col; j++){
+        if ( (abs(i-x0) <=width) && (abs(j-y0) <= width) ){
+          ColorArr[i][j].r = 0;
+          ColorArr[i][j].g = 128;
+          ColorArr[i][j].b = 0;
+        }
+      }
+    }
+    ColorArr[x0][y0].r = 0;
+    ColorArr[x0][y0].g = 0;
+    ColorArr[x0][y0].b = 128;
 
-//   double r = 0;
-//   double g = 0;
-//   double b = 0;
-//   double hf = h / 60.0;
-
-//   int i = (int)floor(h / 60.0);
-//   double f = h / 60.0 - i;
-//   double pv = v * (1 - s);
-//   double qv = v * (1 - s * f);
-//   double tv = v * (1 - s * (1 - f));
-
-//   switch (i) {
-//     case 0:
-//       r = v;
-//       g = tv;
-//       b = pv;
-//       break;
-//     case 1:
-//       r = qv;
-//       g = v;
-//       b = pv;
-//       break;
-//     case 2:
-//       r = pv;
-//       g = v;
-//       b = tv;
-//       break;
-//     case 3:
-//       r = pv;
-//       g = qv;
-//       b = v;
-//       break;
-//     case 4:
-//       r = tv;
-//       g = pv;
-//       b = v;
-//       break;
-//     case 5:
-//       r = v;
-//       g = pv;
-//       b = qv;
-//       break;
-//   }
-
-//   //set each component to a integer value between 0 and 255
-//   int red = constrain((int)255 * r, 0, 255);
-//   int green = constrain((int)255 * g, 0, 255);
-//   int blue = constrain((int)255 * b, 0, 255);
-
-//   pixels.setPixelColor(0, pixels.Color(red, green, blue));
-//   pixels.show();
-// }
+}
