@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <FastLED.h>
+#include <stdlib.h>
 // #include <LiteLED.h>
 // #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
@@ -7,15 +8,15 @@
 #endif
 
 #define BAUD_RATE 115200
-#define NUM_LEDS 120
+#define NUM_LEDS 300
 #define DATA_PIN 2
 #define SEC 1000
 #define INPUT1 4
 #define INPUT2 15
 
 CRGB leds[NUM_LEDS];  // setup for FastLED
-const int row = 12;
-const int col = 10;
+const int row = 15;
+const int col = 20;
 
 typedef struct{
   uint8_t r;
@@ -24,7 +25,13 @@ typedef struct{
 }colors;
 
 
+typedef struct coords
+{
+  int x;
+  int y;
+}coords;
 
+coords plane[64] = {0};
 
 colors ColorArr[row][col] ={ {0} };
 
@@ -39,13 +46,19 @@ void setup() {
 
   // Initialize and begin the LED
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
-  FastLED.setBrightness(64);  // setting brightness to 25%
+  FastLED.setBrightness(64);  // setting brightness to 25% max is 255
 
   // draw_circle(1);
   // draw_square(2);
 
-  Serial.println("Flashed & Running. Now Runnig LED_Driver 1.00.9");
+  Serial.println("Flashed & Running. Now Runnig LED_Driver 1.1.0");
   Serial.println("ESP32 is ready for use :)");
+
+  for (int i=0; i<64; i++){
+    plane[i].x = i/8;
+    int temp = i%16;
+    plane[i].y = (temp>=8)?(15-temp):temp
+  }
 }
 
 
@@ -56,7 +69,7 @@ void loop() {
   int read2 = digitalRead(INPUT2);
   
   if ((read1 == 1) && (read2 == 1)){
-    draw_circle(1);
+    draw_circle(4);
     clear();
     display_shape();
     delay(2*SEC);
@@ -89,7 +102,7 @@ void loop_led(){
   for (int i=0; i<NUM_LEDS; i++){
     leds[i] = CRGB::Red;
     FastLED.show();
-    delay(50);
+    delay(10);
     leds[i] = CRGB::Black;
 
   }

@@ -66,6 +66,39 @@ def plot(a,b,n,Z):
     ax.set_zlim(mi,ma)
     plt.show()
 
+##################################################
+
+def LED_count():
+    k=200
+    a = [0]*k
+    
+    a[1] = 1
+    a[2] = 2
+    a[3] = 3
+    
+    m = 2
+    n = 2
+    x = m*n
+    while (x <= k):
+        a[x] = m+n
+        x = m*n
+        if (m>n):
+            n += 1
+        else:
+            m += 1
+    #print(n," ", m)
+        
+    
+    for i in range(k-4):
+        if (a[i+4] == 0):
+            a[i+4] = a[i+3]
+
+    #print(a[63])
+    #plt.plot(a)
+    #plt.show()
+
+
+
 def main():
     '''    n = 16
     a = np.linspace(0, 15, n)

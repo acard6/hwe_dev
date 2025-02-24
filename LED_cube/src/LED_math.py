@@ -2,13 +2,24 @@ import numpy as np
 import matplotlib.pyplot as plt 
 from mpl_toolkits.mplot3d import Axes3D 
 from matplotlib.animation import FuncAnimation
+from functions import *
+'''
+    file is used for previewing what a certain function will look like on an (x,y,z) space
+    animation allowed
+
+'''
+
+points = 8 #global variable used to change the range. used for current case of 8x8x8 
 
 def main():
-    n = 16
-    x = np.linspace(0,15, n)
-    y = np.linspace(0,15,n)
+    n = points
+    x = np.linspace(0,points-1, points)
+    y = np.linspace(0,points-1,points)
     plot_3d(n,Z=func,a=x,b=y,var=0, ani=True,plot='scat')
     #plot_3d(n, ani=True,mode='bounce')
+    
+    
+
 
 class func_animate():
     def __init__(self, save=False, animate=False, show=False):
@@ -26,38 +37,8 @@ class func_animate():
         pass
 
 
-
-def func(X,Y,var,mode="none"):
-    """
-    function used to test out passing functions into my plotter
-    """
-    #return (np.power(X-1+var,2)+np.power(Y,2))/10-1
-    k = np.pi/112.5
-    l = 7.5
-    A = 8
-    return np.round(A*np.cos(np.power(X-l,2)*k+np.power(Y-l,2)*k+var)+8)
-
-def z_func(X, Y, var, mode='none'):
-    """
-    Default plotted function used by my animated/plotter to show its capabilities
-    """
-    #l = 7.5 # horizontal shift(where it will be centered around)
-    l = np.pi/2
-    k = (np.pi/8)             # period -> T=2*pi/k
-    h = 8
-    A = 8
-    if mode == 'bounce':
-        A = A*np.cos(var)    # amplitude    
-        #A = np.pow(var,1/3)
-        #A = np.power(var-8,2)/32-1
-        #A = 2.1*np.exp(-np.pow(var-2.5,2)/1.4)-1.06
-    else:
-        l += var
-    #z = cos(A)*sin(kx+l)*sin(ky+l)
-    return np.round(A*np.sin(k*X+l)*np.sin(k*Y+l)+h)
-
-N=16
-def plot_3d(n=16,Z=z_func, a=np.linspace(0, N-1, N), b=np.linspace(0, N-1, N),var=0,  ani=False, plot='mesh',mode='none' ):
+N=points
+def plot_3d(n=points,Z=z_func, a=np.linspace(0, N-1, N), b=np.linspace(0, N-1, N),var=0,  ani=False, plot='mesh',mode='none' ):
     """
     this function will plot a predetermined function on a 3d-plane [z(x,y)]
 
@@ -131,41 +112,10 @@ def plot_3d(n=16,Z=z_func, a=np.linspace(0, N-1, N), b=np.linspace(0, N-1, N),va
 
 
 
-def LED_count():
-    k=200
-    a = [0]*k
-    
-    a[1] = 1
-    a[2] = 2
-    a[3] = 3
-    
-    m = 2
-    n = 2
-    x = m*n
-    while (x <= k):
-        a[x] = m+n
-        x = m*n
-        if (m>n):
-            n += 1
-        else:
-            m += 1
-    #print(n," ", m)
-        
-    
-    for i in range(k-4):
-        if (a[i+4] == 0):
-            a[i+4] = a[i+3]
-
-    #print(a[63])
-    #plt.plot(a)
-    #plt.show()
-
-
-
 if __name__ == '__main__':
     main()
 
-
+# these are the different possible color shadings for matplotlib. default is viridis
 '''
 Accent, Accent_r, Blues, Blues_r, BrBG, BrBG_r, BuGn, BuGn_r, BuPu, BuPu_r, CMRmap, CMRmap_r, Dark2, Dark2_r,GnBu, GnBu_r, Grays,
 Greens, Greens_r, Greys, Greys_r, OrRd, OrRd_r, Oranges, Oranges_r, PRGn, PRGn_r, Paired,Paired_r, Pastel1, Pastel1_r, Pastel2, Pastel2_r, 
