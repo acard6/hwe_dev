@@ -2,18 +2,14 @@ from functions import *
 from LED_math import points as points
 import numpy as np
 '''
-since for implementation of LED's i plan on connecting via "snake" method i.e.
+    for "snake" method of connecting wires switches direction every other row
+    need to ensure that data is properly corrected so that it can be converted correctly.
+    additional corrections while need to be made for the fact that x and y at each height
+    will also differ
 
-    z = [ 0   1   2   3   4   5   6   7
-         15  14  13  12  11  10   9   8
-         16            ...
-         31            ...
-         63            ...            56]
-
-
-
-
-
+    TODO
+    - convert the base case where z=0 and points snake
+    - consider how the points will differ at different height and how to deal with them
 
 '''
 
