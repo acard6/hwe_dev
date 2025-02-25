@@ -104,6 +104,19 @@ def main():
     a = np.linspace(0, 15, n)
     b = np.linspace(0, 15, n)
     plot(a,b,n, Z=func)'''
+
+    for i in range(512):
+       z = i//64
+       if (z%2 == 0):
+          x = ((i //8)%8)
+       else:
+          x = 7- ((i //8)%8)
+       temp = i%16
+       if (temp >= 8):
+          y = 15-temp
+       else:
+          y = temp
+       print("({},{},{}):{},".format(x,y,z,i))
     
     pass
 

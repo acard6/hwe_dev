@@ -24,18 +24,17 @@
 '''
 
 import numpy as np
-
-points = 8
+from consts import *
 
 def z_func(X, Y, var, mode='none'):
     """
     Default plotted function used by my animated/plotter to show its capabilities
     """
     #l = 7.5 # horizontal shift(where it will be centered around)
-    l = np.pi/2
-    k = (np.pi/8)             # period -> T=2*pi/k
+    l = np.pi/(points/8)
+    k = (np.pi/(points/2))             # period -> T=2*pi/k
     h = points/2
-    A = points
+    A = points/2
     if mode == 'bounce':
         A = A*np.cos(var)    # amplitude    
         #A = np.pow(var,1/3)
@@ -56,3 +55,15 @@ def func(X,Y,var,mode="none"):
     l = 7.5
     A = (points-2)/2
     return np.round(A*np.cos(np.power(X-l,2)*k+np.power(Y-l,2)*k+var)+A)
+
+
+def snake(var,mode="parametric"):
+    '''
+    this function will not follow standard conventions set by this document as it wil
+    not be a function of z=f(x,y,t) but rather parametric equations.
+    '''
+    t = np.linspace(0,points-1,points)
+
+    x = np.sin(t)
+    y = np.cos(t)
+    z = var*t

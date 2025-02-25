@@ -3,13 +3,14 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D 
 from matplotlib.animation import FuncAnimation
 from functions import *
+
+from consts import *
 '''
     file is used for previewing what a certain function will look like on an (x,y,z) space
     animation allowed
 
 '''
 
-points = 8 #global variable used to change the range. used for current case of 8x8x8 
 
 def main():
     n = points
@@ -80,9 +81,9 @@ def plot_3d(n=points,Z=z_func, a=np.linspace(0, N-1, N), b=np.linspace(0, N-1, N
         X = X.ravel()
         Y = Y.ravel()    
         z = z.ravel()
-        scat = ax.scatter(X,Y,z,c=z,cmap='viridis')
+        scat = ax.scatter(X,Y,z,c=z,cmap=color_map)
     else:       # surface plotting
-        scat = ax.plot_surface(X,Y,z, cmap='viridis')
+        scat = ax.plot_surface(X,Y,z, cmap=color_map)
 
     # limits set by your input
     ax.set_xlim(0,n-1)
@@ -98,15 +99,15 @@ def plot_3d(n=points,Z=z_func, a=np.linspace(0, N-1, N), b=np.linspace(0, N-1, N
             ax.clear()
             z = Z(X,Y, frame*0.05, mode=mode)
             if plot == 'scat':
-                scat = ax.scatter(X,Y,z,c=z,cmap='viridis')    #scatter plot
+                scat = ax.scatter(X,Y,z,c=z,cmap=color_map)    #scatter plot
             else:
-                scat = ax.plot_surface(X,Y,z, cmap='viridis')   #surface plot
+                scat = ax.plot_surface(X,Y,z, cmap=color_map)   #surface plot
 
             ax.set_zlim(mi,ma)
             return scat
 
-        ani = FuncAnimation(fig,update,frames=125, interval=40,blit=False)
-        #ani.save('animation.gif', writer='pillow', fps=30) #save the animation
+        ani = FuncAnimation(fig,update,frames=frame_rate, interval=40,blit=False)
+        #ani.save('C://Users//cardi//Documents//git-repo//hwe_dev//LED_cube//animations//sample.gif', writer='pillow', fps=30) #save the animation
         #plt.colorbar()
         plt.show()
 
@@ -115,13 +116,3 @@ def plot_3d(n=points,Z=z_func, a=np.linspace(0, N-1, N), b=np.linspace(0, N-1, N
 if __name__ == '__main__':
     main()
 
-# these are the different possible color shadings for matplotlib. default is viridis
-'''
-Accent, Accent_r, Blues, Blues_r, BrBG, BrBG_r, BuGn, BuGn_r, BuPu, BuPu_r, CMRmap, CMRmap_r, Dark2, Dark2_r,GnBu, GnBu_r, Grays,
-Greens, Greens_r, Greys, Greys_r, OrRd, OrRd_r, Oranges, Oranges_r, PRGn, PRGn_r, Paired,Paired_r, Pastel1, Pastel1_r, Pastel2, Pastel2_r, 
-PiYG, PiYG_r, PuBu, PuBuGn, PuBuGn_r, PuBu_r, PuOr, PuOr_r,PuRd, PuRd_r, Purples, Purples_r, RdBu, RdBu_r, RdGy, RdGy_r, RdPu, RdPu_r, 
-RdYlBu, RdYlBu_r, RdYlGn, RdYlGn_r,Reds, Reds_r, Sray_ray, gray_r, grey, hot, hot_r, hsv, hsv_r, inferno, inferno_r, jet, jet_r, magma,
-magma_r,nipy_spectral, nipy_spectral_r, ocean, ocean_r, pink, pink_r, plasma, plasma_r, prism, prism_r, rainbow, rainbow_r,seismic,
-seismic_r, spring, spring_r, summer, summer_r, tab10, tab10_r, tab20, tab20_r, tab20b, tab20b_r, tab20c,tab20c_r, terrain, terrain_r,
-turbo, turbo_r, twilight, twilight_r, twilight_shifted, twilight_shifted_r, viridis,viridis_r, winter, winter_r
-'''

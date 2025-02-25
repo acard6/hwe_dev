@@ -1,5 +1,5 @@
 from functions import *
-from LED_math import points as points
+from consts import *
 import numpy as np
 '''
     for "snake" method of connecting wires switches direction every other row
@@ -13,7 +13,8 @@ import numpy as np
 
 '''
 
-def gen_data(f=func, frames=125, n=points, var=0):
+
+def gen_data(f=func, frames=frame_rate, n=points, var=0):
     '''
     using n*n matrix returns the output for a given function of f(x,y)
     note: planes are hard set to have (0,0) as the first point
@@ -31,19 +32,45 @@ def gen_data(f=func, frames=125, n=points, var=0):
     returns:
         z       -   a 2d array witht the final z values per frame
 
-    '''
+    data format is as follows:
+        data[frame][x][y]
+            |-> frame - nth frame
+            |-> x - x coordinate
+            |-> y - y coordinate 
 
+    '''
+    data = np.empty(frames,dtype=object)
     x = np.linspace(0,n-1, n)
     y = np.linspace(0,n-1,n)
     X, Y = np.meshgrid(x,y)
     for i in range(frames):
-        z = f(X,y,i*0.05)
-        #print("frame {}: \n{}".format(i, z))
+        data[i] = f(X,Y,i*0.05)
+
+    return data
     
+
+def arr2int(data):
+    #base case z = 0 regular snaking
+    for frame in range(len(data)):
+        state = np.zeros(512)
+        for x in range(len(data[0])):
+            for y in range(len(data[0][0])):
+                z = data[frame][x][y]
+                
+
+
     
-    
+def color_mapper(color_map):
+    pass
+
+
 def main():
-    gen_data()
+    data = gen_data(func)
+    # for i in range(frame_rate):
+    #     print("{}:\n {}".format(i,data[i]))
+    print(data[120])
+
+    #color_mapper(color_map)
 
 if __name__ == '__main__':
     main()

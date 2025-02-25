@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <FastLED.h>
 #include <stdlib.h>
+#include <EEPROM.h>
 // #include <LiteLED.h>
 // #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
@@ -9,7 +10,7 @@
 
 #define BAUD_RATE 115200
 #define NUM_LEDS 300
-#define DATA_PIN 2
+#define DATA_PIN 2 // blue jumper wire
 #define SEC 1000
 #define INPUT1 4
 #define INPUT2 15
@@ -27,8 +28,7 @@ typedef struct{
 
 typedef struct coords
 {
-  int x;
-  int y;
+  int x,y,z;
 }coords;
 
 coords plane[64] = {0};
@@ -71,14 +71,14 @@ void loop() {
   if ((read1 == 1) && (read2 == 1)){
     draw_circle(4);
     clear();
-    display_shape();
+    display_image();
     delay(2*SEC);
   }
   
   if ((read1 == 1) && (read2 == 0)){
     draw_square(2);
     clear();
-    display_shape();
+    display_image();
     delay(2*SEC);
   }
   if ((read1 == 0) && (read2 == 1)){
@@ -111,10 +111,10 @@ void loop_led(){
 
 /*
  *  
- *  convert the 2d array that describes a shape to the 1d LED matrix
+ *  convert the 2d array that describes an image to the 1d LED matrix
  *  
  */
-void display_shape(){
+void display_image(){
   for (int i = 0; i < row; i++) {
     for (int j=0; j < col; j++){
       leds[i*col+j] = CRGB(ColorArr[i][j].r, ColorArr[i][j].g, ColorArr[i][j].b);
