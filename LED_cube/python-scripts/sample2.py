@@ -105,6 +105,8 @@ def main():
     b = np.linspace(0, 15, n)
     plot(a,b,n, Z=func)'''
 
+
+    #converted an integer into a point in 3d space
     for i in range(512):
        z = i//64
        if (z%2 == 0):

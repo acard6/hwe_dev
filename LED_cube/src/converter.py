@@ -1,6 +1,8 @@
 from functions import *
 from consts import *
 import numpy as np
+import sys
+from map import data_map as hash_map
 '''
     for "snake" method of connecting wires switches direction every other row
     need to ensure that data is properly corrected so that it can be converted correctly.
@@ -14,7 +16,7 @@ import numpy as np
 '''
 
 
-def gen_data(f=func, frames=frame_rate, n=points, var=0):
+def gen_data(f=func, n=points, frames=frame_rate, rate=0.04):
     '''
     using n*n matrix returns the output for a given function of f(x,y)
     note: planes are hard set to have (0,0) as the first point
@@ -24,10 +26,10 @@ def gen_data(f=func, frames=frame_rate, n=points, var=0):
         that returns an array of the heights
     
         X,Y     -   np array that define the nxn plane
-        frames  -   number of frames to be generated for the animation
         n(int)  -   the size of the array as well as determining the upper bound 
-        var     -   step size of how much each frame will variate in its function
-                    (refer to src\functions.py for more info on var)
+        frames  -   number of frames to be generated for the animation
+        rate    -   the time interval between frames in seconds(default is 40 milliseconds)
+    NOTE: (frames x rate) will give you the total time of the 
 
     returns:
         z       -   a 2d array witht the final z values per frame
@@ -44,19 +46,22 @@ def gen_data(f=func, frames=frame_rate, n=points, var=0):
     y = np.linspace(0,n-1,n)
     X, Y = np.meshgrid(x,y)
     for i in range(frames):
-        data[i] = f(X,Y,i*0.05)
+        data[i] = f(X,Y,i*rate)
 
     return data
     
 
 def arr2int(data):
     #base case z = 0 regular snaking
-    for frame in range(len(data)):
-        state = np.zeros(512)
-        for x in range(len(data[0])):
-            for y in range(len(data[0][0])):
+    l = len(data)
+    data_frame = np.zeros(shape=(l,points*points),dtype=np.uint16)  #2d array containing frames where each frame contains the idx of the values to turn on
+    for frame in range(l):
+        for x in range(len(data[0])):                   # iterate through rows
+            for y in range(len(data[0][0])):            # iterate through columns
                 z = data[frame][x][y]
-                
+                idx = hash_map[x,y,z]     
+                data_frame[frame][y+x*points] = idx   
+    return data_frame
 
 
     
@@ -65,10 +70,12 @@ def color_mapper(color_map):
 
 
 def main():
-    data = gen_data(func)
+    data = gen_data(func, frames=60, rate=0.2)
     # for i in range(frame_rate):
     #     print("{}:\n {}".format(i,data[i]))
-    print(data[120])
+    print(data[0])
+    int_frames = arr2int(data)
+    print(int_frames[0])
 
     #color_mapper(color_map)
 

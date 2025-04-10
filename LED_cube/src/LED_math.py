@@ -16,7 +16,7 @@ def main():
     n = points
     x = np.linspace(0,points-1, points)
     y = np.linspace(0,points-1,points)
-    plot_3d(n,Z=func,a=x,b=y,var=0, ani=True,plot='scat')
+    plot_3d(n,Z=func_xz,a=x,b=y,var=0, ani=True,plot='scat')
     #plot_3d(n, ani=True,mode='bounce')
     
     
